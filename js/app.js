@@ -30,37 +30,57 @@
 
 const studentApp = (function () {
  
-    const data = {
-    attendance:{},
-    loadLocalStorage: () => {             
-        data.attendance = JSON.parse(localStorage.attendance) // you must set data.attendace to save the variable!!!
+    const data = {}
+
+    Object.defineProperty(data, 'attendance', {
+        // value: JSON.parse(localStorage.attendance),
+        // writable: false,
+        get: function() {
+            return attendance
         },
-    getAttendance: () => {             
-        return data.attendance // you must set data.attendace to save the variable!!!
-        }
-    }
+
+        set: function(source) {
+            // console.log(source);
+            // console.log(localStorage.attendance);
+            attendance = JSON.parse(source);
+        },
+
+        // updateStudent: function(){
+        //     return(console.log('UPDATE STUDENT'))  DOES NOT WORKS --- only get and set here
+        // }
+        
+    })
+
+
+
 
     const octopus = {
-        initModel:  () => {data.loadLocalStorage()},
-        buildStudentTable: (students) => {
+
+        initModel:  () => {data.attendance = localStorage.attendance},
+
+        buildStudentTable: (students) => {             
             for(key in students){
                 view.printStudentRow( key, students[key] )
             }
         },
+
         updateUser: (name,row) => {
+           
             
             let inputs = row.querySelectorAll('input');
-            console.dir([...inputs]);
+            //console.dir([...inputs]);
             let newAttendance = [...inputs].reduce((acc,v)=>{
                 if(v.checked){
                     acc.push(true)
                 }else acc.push(false)
                 return acc
             },[]);
+
             data.attendance[name] = newAttendance;
             localStorage.attendance = JSON.stringify(data.attendance);
+            
             view.cleanTable();
-            octopus.buildStudentTable(data.getAttendance());
+            octopus.buildStudentTable(data.attendance);
             
         }
     }
@@ -83,7 +103,9 @@ const studentApp = (function () {
                     input.setAttribute("type","checkbox");
                     input.addEventListener('click', (e) => {
                         //console.dir(e.target.parentElement.parentElement);
-                        octopus.updateUser(name,e.target.parentElement.parentElement)
+                           // data.attendance = {}; // WHY THIS ???????
+                        //console.log(data.attendance );
+                        octopus.updateUser(name,e.target.parentElement.parentElement);
                     });
                 if(element){input.setAttribute("checked","checked"); }
                 td.appendChild(input);
@@ -102,6 +124,6 @@ const studentApp = (function () {
     }
 
     octopus.initModel();
-    octopus.buildStudentTable(data.getAttendance());
+    octopus.buildStudentTable(data.attendance);
 
 })();
