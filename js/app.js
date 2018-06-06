@@ -54,17 +54,17 @@ const studentApp = (function () {
             //console.log(row);
             let inputs = row.querySelectorAll('input');
             console.dir([...inputs]);
-            let attendance = [...inputs].reduce((acc,v)=>{
+            let newAttendance = [...inputs].reduce((acc,v)=>{
                 if(v.checked){
                     acc.push(true)
                 }else acc.push(false)
                 return acc
             },[]);
-            console.log (attendance)
-            //get the user row
-            //build the attendance array
-            //update the model
-            //redraw the user row
+            data.attendance[name] = newAttendance;
+            localStorage.attendance = JSON.stringify(data.attendance);
+            view.cleanTable();
+            octopus.buildStudentTable(data.getAttendance());
+            
         }
     }
 
@@ -96,6 +96,10 @@ const studentApp = (function () {
             missedtd.setAttribute("class","missed-col");            
             missedtd.textContent = attend.filter(v=>{return v}).length;
             trow.appendChild(missedtd)
+        },
+        cleanTable: ()=>{
+            let tbody = document.getElementsByTagName('TBODY')[0];
+            tbody.innerHTML = '';
         }
 
     }
