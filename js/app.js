@@ -3,6 +3,7 @@
  * attendance record if one is not found
  * within localStorage.
  */
+
 (function() {
     if (!localStorage.attendance) {
         console.log('Creating attendance records...');
@@ -40,14 +41,10 @@ const studentApp = (function () {
         },
 
         set: function(source) {
-            // console.log(source);
-            // console.log(localStorage.attendance);
-            attendance = JSON.parse(source);
+             attendance = JSON.parse(source);
         },
 
-        // updateStudent: function(){
-        //     return(console.log('UPDATE STUDENT'))  DOES NOT WORKS --- only get and set here
-        // }
+        
         
     })
 
@@ -56,16 +53,21 @@ const studentApp = (function () {
 
     const octopus = {
 
-        initModel:  () => {data.attendance = localStorage.attendance},
+        initModel:  () => {
+            data.attendance = localStorage.attendance
+        },
 
-        buildStudentTable: (students) => {             
+        updateLocalStorage: () =>{
+            localStorage.attendance = JSON.stringify(data.attendance);
+        },
+
+        buildStudentTable: (students ) => {             
             for(key in students){
                 view.printStudentRow( key, students[key] )
             }
         },
 
-        updateUser: (name,row) => {
-           
+        updateUser: ( name, row ) => {
             
             let inputs = row.querySelectorAll('input');
             //console.dir([...inputs]);
@@ -75,10 +77,10 @@ const studentApp = (function () {
                 }else acc.push(false)
                 return acc
             },[]);
-
+           
             data.attendance[name] = newAttendance;
-            localStorage.attendance = JSON.stringify(data.attendance);
             
+            octopus.updateLocalStorage()
             view.cleanTable();
             octopus.buildStudentTable(data.attendance);
             
@@ -87,7 +89,7 @@ const studentApp = (function () {
 
     const view = {
         
-        printStudentRow: (name, attend ) => {
+        printStudentRow: ( name, attend ) => {
             
             let tbody = document.getElementsByTagName('TBODY')[0];
             let trow = document.createElement('TR')
@@ -102,9 +104,7 @@ const studentApp = (function () {
                 let input = document.createElement('INPUT');
                     input.setAttribute("type","checkbox");
                     input.addEventListener('click', (e) => {
-                        //console.dir(e.target.parentElement.parentElement);
-                           // data.attendance = {}; // WHY THIS ???????
-                        //console.log(data.attendance );
+                        
                         octopus.updateUser(name,e.target.parentElement.parentElement);
                     });
                 if(element){input.setAttribute("checked","checked"); }
@@ -116,7 +116,9 @@ const studentApp = (function () {
             missedtd.textContent = attend.filter(v=>{return v}).length;
             trow.appendChild(missedtd)
         },
-        cleanTable: ()=>{
+
+        cleanTable: () => {
+            
             let tbody = document.getElementsByTagName('TBODY')[0];
             tbody.innerHTML = '';
         }
